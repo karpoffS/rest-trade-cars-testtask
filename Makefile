@@ -1,4 +1,4 @@
-.PHONY: help ps build start stop restart logs app vendors default redis db
+.PHONY: help ps build start stop restart logs app vendors migrations credit-program-generate import-data default redis db
 
 default: help
 
@@ -34,6 +34,21 @@ restart: stop start ## Restart docker containers.
 vendors: ## Install vendors. Usage `composer install -n` in app container.
 	@echo "\e[34;1mInstalling vendors...\e[0m"
 	@docker-compose exec php-fpm composer install -n
+	@echo "\e[36;1mDone...\e[0m \n"
+
+migrations: ## Up database tables. Usage `php bin/console doctrine:migrations:migrate` in app container.
+	@echo "\e[34;1mInstalling vendors...\e[0m"
+	@docker-compose exec php-fpm php bin/console doctrine:migrations:migrate -n
+	@echo "\e[36;1mDone...\e[0m \n"
+
+import-data: ## Import cars in database. Usage `php bin/console app:import-data /var/shared/cars.csv` in app container.
+	@echo "\e[34;1mInstalling vendors...\e[0m"
+	@docker-compose exec php-fpm php bin/console app:import-data /var/shared/cars.csv
+	@echo "\e[36;1mDone...\e[0m \n"
+
+credit-program-generate: ## Generate credit in database. Usage `php bin/console app:credit-program:generate` in app container.
+	@echo "\e[34;1mInstalling vendors...\e[0m"
+	@docker-compose exec php-fpm php bin/console app:credit-program:generate
 	@echo "\e[36;1mDone...\e[0m \n"
 
 app: ## Entering in application container.
