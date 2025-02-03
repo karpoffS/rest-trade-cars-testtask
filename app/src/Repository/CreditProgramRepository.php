@@ -2,8 +2,8 @@
 
 namespace App\Repository;
 
+use App\Application\DTO\CreditProgram as CreditProgramDto;
 use App\Domain\Model\Entry\CreditProgramEntry;
-use App\Domain\Model\Request\CreditProgramRequest;
 use App\Entity\CreditProgram;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -57,36 +57,36 @@ class CreditProgramRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param CreditProgramRequest $dto
+     * @param CreditProgramDto $dto
      * @return \Doctrine\DBAL\Result
      * @throws \Doctrine\DBAL\Exception
      */
-    public function fetchByParams(CreditProgramRequest $dto)
+    public function fetchByParams(CreditProgramDto $dto)
     {
-        $sql = "SELECT * FROM credit_program WHERE id >= FLOOR(2 + RAND()*(SELECT MAX(id) FROM credit_program WHERE ";
+        $sql = "SELECT * FROM credit_program WHERE id >= FLOOR(2 + RAND() * (SELECT MAX(id) FROM credit_program WHERE ";
         $params = [];
 
         if (!is_null($dto->getLoanTerm()) && !is_null($dto->getInitialPayment())) {
-            if ($dto->getLoanTerm() <= 60 && $dto->getInitialPayment() >= 200000) {
+            if ($dto->getLoanTerm()->getValue() <= 60 && $dto->getInitialPayment()->getValue() >= 200000) {
                 $sql = "SELECT * FROM credit_program WHERE id = 1";
                 $params = [];
             } else {
                 $sql .= "(JSON_VALUE(credit_program.conditions , '$.loanTerm[1]') <= :loanTerm AND JSON_VALUE(credit_program.conditions , '$.initialPayment[0]') >= :initialPayment)";
-                $sql .= " OR !(JSON_VALUE(credit_program.conditions , '$.loanTerm[1]') <= :loanTerm AND JSON_VALUE(credit_program.conditions , '$.initialPayment[0]') >= :initialPayment)))";
-                $sql .= " LIMIT 1";
+                $sql .= " OR !(JSON_VALUE(credit_program.conditions , '$.loanTerm[1]') <= :loanTerm AND JSON_VALUE(credit_program.conditions , '$.initialPayment[0]') >= :initialPayment))";
+                $sql .= ") LIMIT 1";
 
-                $params['loanTerm'] = $dto->getLoanTerm();
-                $params['initialPayment'] = $dto->getInitialPayment();
+                $params['loanTerm'] = $dto->getLoanTerm()->getValue();
+                $params['initialPayment'] = $dto->getInitialPayment()->getValue();
             }
         } else {
             if ($dto->getLoanTerm() && is_null($dto->getInitialPayment())) {
 
                 $sql .= "(JSON_VALUE(credit_program.conditions , '$.loanTerm[1]') <= :loanTerm)";
-                $params['loanTerm'] = $dto->getLoanTerm();
+                $params['loanTerm'] = $dto->getLoanTerm()->getValue();
             }
             if ($dto->getInitialPayment() && is_null($dto->getLoanTerm())) {
                 $sql .= " AND (JSON_VALUE(credit_program.conditions , '$.initialPayment[0]'))";
-                $params['initialPayment'] = $dto->getInitialPayment();
+                $params['initialPayment'] = $dto->getInitialPayment()->getValue();
             }
         }
 

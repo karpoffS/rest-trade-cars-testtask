@@ -2,15 +2,15 @@
 
 namespace App\Controller\Api\V1;
 
+use App\Application\DTO\CreditProgram as CreditProgramDTO;
 use App\Controller\Api\BaseController;
 use App\DataMapper\V1\CreditProgramMapper;
 use App\Domain\Model\Entry\CreditProgramEntry;
-use App\Domain\Model\Request\CreditProgramRequest;
 use App\Entity\CreditProgram;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\{HttpFoundation\JsonResponse, HttpFoundation\Request as HttpRequest, Routing\Annotation\Route};
-use OpenApi\Annotations as OA;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use OpenApi\Annotations as OA;
+use Symfony\Component\{HttpFoundation\JsonResponse, HttpFoundation\Request as HttpRequest, Routing\Annotation\Route};
 
 /**
  * @Route("/api/v1/credit", requirements={"_locale": "en|ru"}, name="credit_")
@@ -50,14 +50,11 @@ class CreditController extends BaseController
     public function calculate(HttpRequest $request, ManagerRegistry $doctrine, CreditProgramMapper $mapper): JsonResponse
     {
         $price = (int) $request->get('price');
-        $initialPayment = floatval($request->get('initialPayment'));
-        $loanTerm = intval($request->get('loanTerm'));
+        $loanTerm = (int) $request->get('loanTerm');
 
         $repo = $doctrine->getManager()->getRepository(CreditProgram::class);
         /** @var CreditProgramEntry|null $program */
-        $program = $repo->fetchByParams(
-            (new CreditProgramRequest())->setInitialPayment($initialPayment)->setLoanTerm($loanTerm)
-        );
+        $program = $repo->fetchByParams(CreditProgramDTO::fromRequest($request));
 
         return $this->json(
             $mapper->from($program, ['price' => $price, 'loanTerm' => $loanTerm])->map()

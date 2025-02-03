@@ -4,16 +4,15 @@ namespace App\Command;
 
 use App\Entity\CreditProgram;
 use Doctrine\Persistence\ManagerRegistry;
-use Faker\Factory as FakerFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class GenerateCreditProgramCommand extends Command
+class CreditProgramGenerateCommand extends Command
 {
     protected static $defaultName = 'app:credit-program:generate';
-    protected static $defaultDescription = 'Generate credit program for your app';
+    protected static $defaultDescription = 'Generate credit programs for your app';
     private ManagerRegistry $doctrine;
 
     public function __construct(?string $name = null, ManagerRegistry $doctrine)
@@ -27,26 +26,6 @@ class GenerateCreditProgramCommand extends Command
         $io = new SymfonyStyle($input, $output);
         try {
             $manager = $this->doctrine->getManager();
-            $faker = FakerFactory::create();
-
-            // Расчет кредита по указанным параметрам из кредитной формы
-            //Входные данные в запросе:
-            //    • price: Цена автомобиля (int, required). Пример: 1401000
-            //    • initialPayment: Первоначальный взнос за кредит. В запросе отдаются рубли с копейками. (float: точность до десятых долей, required). Пример: 200000,56
-            //    • loanTerm: Срок кредита в месяцах (int, required). Пример: 64
-            //
-            //Ответ запроса на расчет ежемесячного платежа
-            //    • programId: Уникальный id кредитной программы
-            //    • interestRate: Процентная ставка кредитной программы (float, точность до десятых долей). Пример: 12.3
-            //    • monthlyPayment: Ежемесячный платёж (int). Пример: 24276
-            //    • title: Название кредитной программы (str). Пример: “Alfa Energy”
-
-            // Алгоритм расчета кредитных на Ваше усмотрение
-            //  Пример: если первоначальный взнос более 200000 р.,
-            //      платеж в месяц до 10000 р.,
-            //      срок кредита менее 5 лет – выводить программу с процентной ставкой 12.3,
-            //      платеж в месяц от 9800 р., иначе любую другую кредитную программу
-            //  Кредитные программы должны храниться в БД
 
             $items = [
                 ['title' => 'Alfa Energy', 'Conditions' => ['loanTerm' => [1, 60], 'initialPayment' => [200000, null]], 'interestRate' => [1230, 1230]],

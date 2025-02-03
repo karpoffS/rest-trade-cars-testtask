@@ -13,7 +13,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class CreditProgramListCommand extends Command
 {
     protected static $defaultName = 'app:credit-program:list';
-    protected static $defaultDescription = 'Add credit program for your app';
+    protected static $defaultDescription = 'List credit programs for your app';
     private ManagerRegistry $doctrine;
 
     public function __construct(?string $name = null, ManagerRegistry $doctrine)
@@ -30,7 +30,7 @@ class CreditProgramListCommand extends Command
         $repo = $em->getRepository(CreditProgram::class);
         $io->title('List of Credit programs.');
         $io->table(
-            ['ID', 'Title', 'Conditions', 'InterestRate'],
+            ['ID', 'Title', 'Conditions', 'Interest Rates'],
             array_map(
                 static function(CreditProgram $p){
                     return [

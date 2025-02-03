@@ -2,8 +2,6 @@
 
 namespace App\Domain\Model\Entry;
 
-use App\Domain\Model\Request\CreditProgramRequest;
-
 class CreditProgramEntry
 {
     private ?int $id;
